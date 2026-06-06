@@ -5,7 +5,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -51,7 +50,7 @@ func Read() (Config, error) {
 
 func (c *Config) SetUser(userName string) error {
 	c.CurrentUserName = userName
-	write(c)
+	write(*c)
 	return nil
 }
 

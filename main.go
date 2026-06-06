@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"github.com/adrake333/gatorcli/internal/config"
+	"log"
 )
 
 
