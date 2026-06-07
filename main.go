@@ -19,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 	appState := state{
-		cfg: cfg,
+		cfg: &cfg,
 	}
 	cmds := commands{
 		handlers: make(map[string]func(*state, command) error),

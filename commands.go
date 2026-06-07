@@ -41,7 +41,7 @@ func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
 		return errors.New("invalid command")
 	}
-	err := s.config.SetUser(cmd.args[0])
+	err := s.cfg.SetUser(cmd.args[0])
 	if err != nil {
 		return err
 	}
