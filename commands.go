@@ -13,6 +13,7 @@ import (
 
 
 type state struct {
+	db	*database.Queries
 	cfg	*config.Config
 }
 

@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"github.com/adrake333/gatorcli/internal/config"
+	_ "github.com/lib/pq"
 	"log"
 	"os"
 )
@@ -15,6 +16,10 @@ import (
 
 func main() {
 	cfg, err := config.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
 		log.Fatal(err)
 	}
