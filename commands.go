@@ -4,9 +4,14 @@ package main
 
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/adrake333/gatorcli/internal/config"
+	"github.com/adrake333/gatorcli/internal/database"
+	"github.com/google/uuid"
+	"os"
+	"time"
 )
 
 
@@ -47,5 +52,26 @@ func handlerLogin(s *state, cmd command) error {
 		return err
 	}
 	fmt.Println("user has been set")
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error {
+	if len(cmd.args) == 0 {
+		return errors.New("invalid command")
+	}
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID:		uuid.New(),
+		CreatedAt:	time.Now(),
+		UpdatedAt:	time.Now(),
+		Name:		cmd.args[0],
+	})
+	if err != nil {
+		os.Exit(1)
+	}
+	err = s.cfg.SetUser(cmd.args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Printf("New user, %v, has been created\n", user)
 	return nil
 }

@@ -4,8 +4,10 @@ package main
 
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/adrake333/gatorcli/internal/config"
+	"github.com/adrake333/gatorcli/internal/database"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -23,7 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	dbQueries := database.New(db)
 	appState := state{
+		db: dbQueries,
 		cfg: &cfg,
 	}
 	cmds := commands{
