@@ -38,6 +38,11 @@ func main() {
 		fmt.Println("invalid command")
 		os.Exit(1)
 	}
+	cmds.register("register", handlerRegister)
+	if len(os.Args) < 2 {
+		fmt.Println("invalid command")
+		os.Exit(1)
+	}
 	commandName := os.Args[1]
 	commandArgs := os.Args[2:]
 	cmd := command{

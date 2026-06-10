@@ -72,6 +72,6 @@ func handlerRegister(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("New user, %v, has been created\n", user)
+	fmt.Printf("New user, %v, has been created\n", user.Name)
 	return nil
 }
