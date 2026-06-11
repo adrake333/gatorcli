@@ -43,6 +43,8 @@ func main() {
 		fmt.Println("invalid command")
 		os.Exit(1)
 	}
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
 	commandName := os.Args[1]
 	commandArgs := os.Args[2:]
 	cmd := command{
