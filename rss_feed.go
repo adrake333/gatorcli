@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"encoding/xml"
 	"html"
 	"io"
 	"net/http"
