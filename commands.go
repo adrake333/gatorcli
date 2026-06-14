@@ -112,3 +112,7 @@ func handlerAgg(s *state, cmd command) error {
 	fmt.Printf("%+v\n", feed)
 	return nil
 }
+
+func handlerAddFeed(s *state, cmd command) error {
+	current := s.cfg.CurrentUserName
+}
