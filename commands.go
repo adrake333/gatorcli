@@ -164,4 +164,21 @@ func handlerFollow(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
+	feed, err := s.db.GetFeedByUrl(context.Background(), cmd.args[0])
+	if err != nil {
+		return err
+	}
+	follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:		uuid.New(),
+		CreatedAt:	time.Now(),
+		UpdatedAt:	time.Now(),
+		UserID:		current.ID,
+		FeedID:		feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Current User: %v\n", follow.UserName)
+	fmt.Printf("Feed: %v\n", follow.FeedName)
+	return nil
 }
