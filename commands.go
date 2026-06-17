@@ -135,7 +135,17 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", feed)
+	_, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:		uuid.New(),
+		CreatedAt:	time.Now(),
+		UpdatedAt:	time.Now(),
+		UserID:		current.ID,
+		FeedID:		feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Feed Name: %v\nFeed URL: %v\n", feed.Name, feed.Url)
 	return nil
 }
 
@@ -180,5 +190,20 @@ func handlerFollow(s *state, cmd command) error {
 	}
 	fmt.Printf("Current User: %v\n", follow.UserName)
 	fmt.Printf("Feed: %v\n", follow.FeedName)
+	return nil
+}
+
+func handlerFollowing(s *state, cmd command) error {
+	current, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	follows, err := s.db.GetFeedFollowsForUser(context.Background(), current.ID)
+	if err != nil {
+		return err
+	}
+	for _, follow := range follows {
+		fmt.Printf("Feed: %v\n", follow.FeedName)
+	}
 	return nil
 }
