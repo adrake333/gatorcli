@@ -5,12 +5,16 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/adrake333/gatorcli/internal/config"
 	"github.com/adrake333/gatorcli/internal/database"
 	"github.com/google/uuid"
+	"log"
 	"os"
+	"strings"
+	"strconv"
 	"time"
 )
 
@@ -142,7 +146,31 @@ func scrapeFeeds(s *state) error {
 		return err
 	}
 	for _, item := range fetched.Channel.Item {
-		fmt.Println(item.Title)
+		publishedAt := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt.Time = t
+			publishedAt.Valid = true
+		}
+		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID: 		uuid.New(),
+			CreatedAt:	time.Now(),
+			UpdatedAt:	time.Now(),
+			Title:		item.Title,
+			Url:		item.Link,
+			Description:	sql.NullString{
+				String:	item.Description,
+				Valid:	true,
+			},
+			PublishedAt:	publishedAt,
+			FeedID:		feed.ID,
+		})
+		if err != nil {
+    			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+        			continue
+    			}
+    			log.Printf("Couldn't create post: %v", err)
+    			continue
+		}
 	}
 	return nil
 }
@@ -244,6 +272,28 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 	})
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	limit := 2
+	var err error
+	if len(cmd.args) > 0 {
+		limit, err = strconv.Atoi(cmd.args[0])
+		if err != nil {
+			return fmt.Errorf("invalid limit: %w", err)
+		}
+	}
+	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
+		Limit:	int32(limit),
+		UserID:	user.ID,
+	})
+	if err != nil {
+		return err
+	}
+	for _, post := range posts {
+		fmt.Printf("Title: %s\nURL: %s\n\n", post.Title, post.Url)
 	}
 	return nil
 }
