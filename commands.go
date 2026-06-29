@@ -115,11 +115,35 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	timeBetweenReqs := cmd.args[0]
+	duration, err := time.ParseDuration(timeBetweenReqs)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", feed)
+	fmt.Printf("Collecting feeds every %v\n", duration)
+	ticker := time.NewTicker(duration)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
+	return nil
+}
+
+func scrapeFeeds(s *state) error {
+	feed, err := s.db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return err
+	}
+	err = s.db.MarkFeedFetched(context.Background(), feed.ID)
+	if err != nil {
+		return err
+	}
+	fetched, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		return err
+	}
+	for _, item := range fetched.Channel.Item {
+		fmt.Println(item.Title)
+	}
 	return nil
 }
 
